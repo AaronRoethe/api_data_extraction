@@ -2,6 +2,7 @@ from datetime import date, timedelta
 from pandas.tseries.holiday import AbstractHolidayCalendar, Holiday, nearest_workday, \
     USMartinLutherKingJr, USPresidentsDay, USMemorialDay, USLaborDay, USThanksgivingDay
 import pandas as pd
+import json, io
 
 class CioxHoliday(AbstractHolidayCalendar):
     rules = [
@@ -45,3 +46,14 @@ def x_Bus_Day_ago(N):
             B10.append(item)
         i -= timedelta(days=1)
     return B10[-1]
+
+def class_inputs(api_object):
+    inputs = dict(vars(api_object))
+    del inputs['key']
+    del inputs['secret']
+    return inputs # json.dumps(inputs, indent=4)
+
+def save_df_info(df):
+    buffer = io.StringIO()
+    df.info(buf=buffer)
+    return buffer.getvalue()

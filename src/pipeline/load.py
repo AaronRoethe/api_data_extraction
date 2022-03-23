@@ -5,7 +5,6 @@ import pandas as pd
 def sql_engine(server, database) -> sqlalchemy.engine.base.Engine:
     # Enterprise DB to be used
     # pyodbc stuff for MS SQL Server Express
-    # pyodbc stuff for MS SQL Server Express
     driver='{SQL Server}'
     trusted_connection='yes'
 
@@ -20,7 +19,6 @@ def sql_engine(server, database) -> sqlalchemy.engine.base.Engine:
     """ more code not shown that uses pyodbc without sqlalchemy """
     # from sqlalchemy import event
     engine = sqlalchemy.create_engine(connection_url, fast_executemany = True)
-
     return engine
 
 def load_MSSQL(engine:sqlalchemy.engine.base.Engine, df:pd.DataFrame(), table_name:str, schema:str = 'dbo') -> None:

@@ -3,19 +3,16 @@ import base64
 import base64
 from io import StringIO
 
-def decode_encode(output:str) -> str:
+def decode_encode(api_request:str) -> str:
     ##Check keys in the JSON
     # key_list = list(output.keys()) 
 
     #extract file column from 'output' dict
-    raw = output["file"]
-
+    raw = api_request["file"]
     #decode file value from base64 and convert to string
     raw_string = base64.b64decode(raw)
-
     #convert raw_string to utf-8 str
     utf_8 = str(raw_string, 'utf-8')
-
     #wrap in StrinIO to convert to df
     cleaned = StringIO(utf_8)
     return cleaned

@@ -1,11 +1,11 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import requests, json
 from requests.structures import CaseInsensitiveDict
 
 @dataclass
 class api():
-    key:str
-    secret:str
+    _key:str             = field(repr=False)
+    _secret:str          = field(repr=False)
     reportId:str
     start:str
     end:str
@@ -19,8 +19,8 @@ class api():
         url = "https://na1.nice-incontact.com/authentication/v1/token/access-key"
         headers = {'Content-Type': 'application/json'}
         payload = f"""{{
-                    "accessKeyId":"{self.key}",
-                    "accessKeySecret":"{self.secret}"
+                    "accessKeyId":"{self._key}",
+                    "accessKeySecret":"{self._secret}"
                     }}"""
         response = requests.request("POST", url, headers=headers, data=payload)
         data = json.loads(response.text)

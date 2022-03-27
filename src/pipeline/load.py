@@ -1,33 +1,29 @@
+from dataclasses import dataclass, field
 import sqlalchemy
 from sqlalchemy.engine import URL
 import pandas as pd
+import time
 
-def sql_engine(server, database) -> sqlalchemy.engine.base.Engine:
-    # Enterprise DB to be used
-    # pyodbc stuff for MS SQL Server Express
-    driver='{SQL Server}'
-    trusted_connection='yes'
 
-    # pyodbc connection string
-    connection_string = f'DRIVER={driver};SERVER={server};'
-    connection_string += f'DATABASE={database};'
-    connection_string += f'TRUSTED_CONNECTION={trusted_connection}'
+@dataclass
+class MSSQL:
+    server  : str
+    database: str
+    driver  : str = "ODBC Driver 17 for SQL Server"
+    engine  : sqlalchemy.engine = field(init=False)
 
-    # create sqlalchemy engine connection URL
-    connection_url = URL.create(
-        "mssql+pyodbc", query={"odbc_connect": connection_string})
-    """ more code not shown that uses pyodbc without sqlalchemy """
-    # from sqlalchemy import event
-    engine = sqlalchemy.create_engine(connection_url, fast_executemany = True)
-    return engine
+    def __post_init__(self) -> None:
+        self.engine = sqlalchemy.create_engine(
+        f"mssql+pyodbc://{self.server}/{self.database}?driver={self.driver}", fast_executemany=True)
 
-def load_MSSQL(engine:sqlalchemy.engine.base.Engine, df:pd.DataFrame(), table_name:str, schema:str = 'dbo') -> None:
-    try:
-        conn = engine.connect()
-        print("Connected to server")
-    except:
-        print("Check connection")
-        load_MSSQL(df)
-    # form SQL statement
-    df.to_sql(table_name, engine, index=False, if_exists="append", schema=schema)
-    print("Insert Complete")
+def sql_insert(load, server: MSSQL, table):
+    # ask to go forward with insert
+    if input("Enter(y/n): ") == 'y':
+        pass
+    else:
+        raise SystemExit
+    ### Load file ###
+    t0 = time.time()
+    ### Add today's file #
+    load.to_sql(table, server.engine, index=False, if_exists="append")
+    print(f'Inserts completed in {time.time() - t0:.2f} seconds.')

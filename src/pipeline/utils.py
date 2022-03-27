@@ -49,8 +49,8 @@ def x_Bus_Day_ago(N):
 
 def class_inputs(api_object):
     inputs = dict(vars(api_object))
-    del inputs['key']
-    del inputs['secret']
+    del inputs['_key']
+    del inputs['_secret']
     return inputs # json.dumps(inputs, indent=4)
 
 def save_df_info(df):

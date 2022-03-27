@@ -16,7 +16,7 @@ from pipeline.config import api_keys
 from pipeline.extract import api
 from pipeline.utils import last_business_day, class_inputs, save_df_info
 from pipeline.transform import decode_encode, string_to_df, clean_df
-from pipeline.load import sql_engine, load_MSSQL
+from pipeline.load import MSSQL, sql_insert
 from pipeline.log import log_everthing
 
 def main():
@@ -37,7 +37,6 @@ def main():
     report_500 = api(api_key, secret, reportId, startDate, endDate)
     ### collect & log inputs
     log_everthing("INPUTS",class_inputs(report_500))
-
     ### api requested data
     response = report_500.request_report()
     log_everthing("STATUS_CODE", (response.status_code, response.reason))
@@ -53,9 +52,8 @@ def main():
     # log_everthing(f"CLEAN DF_INFO: {save_df_info(load)}")
     print(load)
     # load into server
-    if input("Do you want to insert into SQL(y/n): ") == 'y':
-        engine = sql_engine(server, database)
-        load_MSSQL(engine, load, table_name=table)
+    dwworking   = MSSQL(server, database)
+    sql_insert(load, dwworking, table)
     log_everthing("COMPLETED", datetime.now() - starttime)
 
 if __name__ == "__main__":

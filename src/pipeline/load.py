@@ -1,12 +1,12 @@
-from dataclasses import dataclass, field
 import sqlalchemy
-from sqlalchemy.engine import URL
 import pandas as pd
 import time
 
+def before_insert(engine:sqlalchemy.engine, remove:str) -> None:
+    engine.execute(remove)
+    # print(pd.read_sql(lookup, engine))
 
-
-def sql_insert(load, engine: sqlalchemy.engine, table):
+def sql_insert(engine: sqlalchemy.engine, table:str, load:pd.DataFrame()):
     # ask to go forward with insert
     if input("Enter(y/n): ") == 'y':
         pass

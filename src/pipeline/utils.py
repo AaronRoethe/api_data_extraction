@@ -1,7 +1,6 @@
 from datetime import date, timedelta
 from pandas.tseries.holiday import AbstractHolidayCalendar, Holiday, nearest_workday, \
     USMartinLutherKingJr, USPresidentsDay, USMemorialDay, USLaborDay, USThanksgivingDay
-import pandas as pd
 import json, io
 
 class CioxHoliday(AbstractHolidayCalendar):

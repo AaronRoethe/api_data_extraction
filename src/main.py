@@ -12,30 +12,32 @@ Updated on Fri Mar 18
 #Import required packages
 from datetime import datetime, date
 
-from pipeline.config import api_keys
-from pipeline.connections import MSSQL
-from pipeline.extract import api
+import pipeline.extract
 from pipeline.utils import last_business_day, class_inputs, save_df_info
 from pipeline.transform import decode_encode, string_to_df, clean_df
-from pipeline.load import sql_insert
+from pipeline.load import sql_insert,before_insert
 from pipeline.log import log_everthing
+import server.config
+import server.connections
+import server.queries.remove_dup
 
 def main():
     ### log start time
     starttime = datetime.now()
 
     ### inputs
-    api_key, secret = api_keys()
+    api_key, secret = server.config.api_keys()
     startDate       = last_business_day(date.today()).isoformat()
     endDate         = date.today().isoformat()
     reportId        = '500'
     # server          = 'EUS1PCFSNAPDB01'
-    server          = 'EUS1QCFSNAPDB01'
+    server_name     = 'EUS1QCFSNAPDB01'
     database        = 'DWWorking'
     table           = 'api_nic_agentbyday'
 
     ### call api class    
-    report_500 = api(api_key, secret, reportId, startDate, endDate)
+    report_500 = pipeline.extract.api(
+        api_key, secret, reportId, startDate, endDate)
     ### collect & log inputs
     log_everthing("INPUTS",class_inputs(report_500))
     ### api requested data
@@ -53,9 +55,11 @@ def main():
     # log_everthing(f"CLEAN DF_INFO: {save_df_info(load)}")
     print(load)
     # load into server
-    dwworking   = MSSQL(server, database)
+    dwworking   = server.connections.MSSQL(server_name, database)
     dw_engine   = dwworking.create_engine()
-    sql_insert(load, dw_engine, table)
+    remove_dup  = server.queries.remove_dup.sql(endDate)
+    before_insert(dw_engine, remove_dup)
+    sql_insert(dw_engine, table, load)
     log_everthing("COMPLETED", datetime.now() - starttime)
 
 if __name__ == "__main__":

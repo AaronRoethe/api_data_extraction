@@ -13,10 +13,11 @@ Updated on Fri Mar 18
 from datetime import datetime, date
 
 from pipeline.config import api_keys
+from pipeline.connections import MSSQL
 from pipeline.extract import api
 from pipeline.utils import last_business_day, class_inputs, save_df_info
 from pipeline.transform import decode_encode, string_to_df, clean_df
-from pipeline.load import MSSQL, sql_insert
+from pipeline.load import sql_insert
 from pipeline.log import log_everthing
 
 def main():
@@ -53,7 +54,8 @@ def main():
     print(load)
     # load into server
     dwworking   = MSSQL(server, database)
-    sql_insert(load, dwworking, table)
+    dw_engine   = dwworking.create_engine()
+    sql_insert(load, dw_engine, table)
     log_everthing("COMPLETED", datetime.now() - starttime)
 
 if __name__ == "__main__":

@@ -1,23 +1,11 @@
-"""
-Created on Thu Dec  2 11:23:19 2021
-Created on Thu Aug  5 13:45:36 2021
-@author: RGotety
-
-Updated on Fri Mar 18
-@author: Aaron Roethe
-"""
-
-###Generates a custom report via post request
-
-#Import required packages
 from datetime import datetime, date
+import os
 
 import pipeline.extract
 from pipeline.utils import last_business_day, class_inputs, save_df_info
 from pipeline.transform import decode_encode, string_to_df, clean_df
 from pipeline.load import sql_insert,before_insert
 from pipeline.log import log_everthing
-import server.config
 import server.connections
 import server.queries.remove_dup
 
@@ -26,14 +14,15 @@ def main():
     starttime = datetime.now()
 
     ### inputs
-    api_key, secret = server.config.api_keys()
     startDate       = last_business_day(date.today()).isoformat()
     endDate         = date.today().isoformat()
     reportId        = '500'
-    # server          = 'EUS1PCFSNAPDB01'
-    server_name     = 'EUS1QCFSNAPDB01'
-    database        = 'DWWorking'
-    table           = 'api_nic_agentbyday'
+
+    api_key         = os.environ['api_key']
+    secret          = os.environ['secret'] 
+    server_name     = os.environ['server_name']
+    database        = os.environ['database']
+    table           = os.environ['table']
 
     ### call api class    
     report_500 = pipeline.extract.api(
